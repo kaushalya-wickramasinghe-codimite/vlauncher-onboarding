@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "VLauncher User Registration",
+  "version": "1.0.0",
+  "description": "Registers Chrome users with VLauncher system",
+  "permissions": [
+    "identity",
+    "identity.email"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "VLauncher Registration"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

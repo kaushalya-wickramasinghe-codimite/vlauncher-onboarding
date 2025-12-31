@@ -1,0 +1,447 @@
+@page
+@model VLauncher.Web.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VLauncher - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-40">
+        <!-- Logo -->
+        <div class="p-5 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center shadow-md">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800">VLauncher</h1>
+                    <p class="text-xs text-gray-500">Admin Panel</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="p-4">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">Menu</p>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-primary-700 bg-primary-50 rounded-lg font-medium mb-1">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span>User Management</span>
+            </a>
+        </nav>
+
+        <!-- User Info at Bottom -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-primary-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 truncate">@Model.DisplayName</p>
+                    <p class="text-xs text-gray-500">Administrator</p>
+                </div>
+                <a href="/Admin/Logout"
+                   class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                   title="Logout">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 min-h-screen">
+        <!-- Top Header -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <div class="px-8 py-4 flex items-center justify-between">
+                <div>
+                    <div class="flex items-center gap-2 text-gray-400 text-sm mb-1">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">User Management</h1>
+                </div>
+                <div class="flex items-center gap-3 text-sm text-gray-500">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>@DateTime.Now.ToString("MMM dd, yyyy")</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            @Html.AntiForgeryToken()
+
+            <!-- Alerts -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center gap-3 shadow-sm">
+                    <i data-lucide="check-circle" class="w-5 h-5 flex-shrink-0"></i>
+                    <span>@TempData["Success"]</span>
+                    <button onclick="this.parentElement.remove()" class="ml-auto hover:text-green-900">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center gap-3 shadow-sm">
+                    <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+                    <span>@TempData["Error"]</span>
+                    <button onclick="this.parentElement.remove()" class="ml-auto hover:text-red-900">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            }
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                @{
+                    var totalUsers = Model.Users.Count();
+                    var registeredCount = Model.Users.Count(u => u.Status == VLauncher.Domain.Enums.UserStatus.Registered);
+                    var pendingCount = Model.Users.Count(u => u.Status == VLauncher.Domain.Enums.UserStatus.Pending);
+                }
+                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">@totalUsers</p>
+                            <p class="text-sm text-gray-500">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="user-check" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">@registeredCount</p>
+                            <p class="text-sm text-gray-500">Registered</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="user-plus" class="w-6 h-6 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-gray-800">@pendingCount</p>
+                            <p class="text-sm text-gray-500">Pending</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Card -->
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <!-- Tabs -->
+                <div class="border-b border-gray-200 bg-gray-50">
+                    <div class="flex">
+                        <button onclick="showTab('registered')" id="tab-registered"
+                                class="tab-btn px-6 py-4 text-sm font-medium border-b-2 border-primary-600 text-primary-600 bg-white -mb-px">
+                            Registered Users (@registeredCount)
+                        </button>
+                        <button onclick="showTab('pending')" id="tab-pending"
+                                class="tab-btn px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                            Pending Users (@pendingCount)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="searchInput" onkeyup="filterTable()"
+                               placeholder="Search users..."
+                               class="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-72 shadow-sm" />
+                    </div>
+                </div>
+
+                <!-- Table -->
+                @if (!Model.Users.Any())
+                {
+                    <div class="px-6 py-16 text-center">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i data-lucide="user-plus" class="w-10 h-10 text-gray-400"></i>
+                        </div>
+                        <h4 class="text-gray-800 font-semibold text-lg mb-2">No Users Found</h4>
+                        <p class="text-gray-500">Users will appear here when they register via the Chrome extension.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="overflow-x-auto">
+                        <table class="w-full" id="usersTable">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Google Email</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">AD User Principal Name</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach (var user in Model.Users)
+                                {
+                                    var statusClass = user.Status == VLauncher.Domain.Enums.UserStatus.Pending ? "pending" : "registered";
+                                    <tr onclick="openUserModal(@user.Id)"
+                                        class="hover:bg-gray-50 cursor-pointer transition-colors user-row @statusClass"
+                                        data-status="@statusClass">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                                                    <i data-lucide="mail" class="w-4 h-4 text-gray-500"></i>
+                                                </div>
+                                                <span class="text-gray-800 text-sm font-medium">@user.GoogleEmail</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if (string.IsNullOrEmpty(user.AdUserPrincipalName))
+                                            {
+                                                <span class="text-gray-400 text-sm italic">N/A</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-600 text-sm font-mono bg-gray-100 px-2 py-1 rounded">@user.AdUserPrincipalName</span>
+                                            }
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if (user.Status == VLauncher.Domain.Enums.UserStatus.Pending)
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                                                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                                                    Pending
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                                    <i data-lucide="check" class="w-3 h-3"></i>
+                                                    Registered
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="text-gray-500 text-sm">@user.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right" onclick="event.stopPropagation();">
+                                            <form method="post" asp-page-handler="Delete" class="inline">
+                                                <input type="hidden" name="userId" value="@user.Id" />
+                                                <button type="submit"
+                                                        onclick="return confirm('Are you sure you want to delete this user?')"
+                                                        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all shadow-sm border border-transparent hover:border-red-200"
+                                                        title="Delete User">
+                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="userModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div class="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl pointer-events-auto border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 rounded-t-xl">
+                    <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <i data-lucide="user-cog" class="w-5 h-5 text-primary-600"></i>
+                        User Details
+                    </h3>
+                    <button onclick="closeModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div id="modalBody" class="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+                    <div class="flex items-center justify-center py-8">
+                        <div class="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentTab = 'registered';
+
+        function showTab(tab) {
+            currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-primary-600', 'text-primary-600', 'bg-white', '-mb-px');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            const activeTab = document.getElementById('tab-' + tab);
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+            activeTab.classList.add('border-primary-600', 'text-primary-600', 'bg-white', '-mb-px');
+
+            // Filter rows
+            document.querySelectorAll('.user-row').forEach(row => {
+                if (row.dataset.status === tab) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function filterTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.user-row').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const matchesSearch = text.includes(searchText);
+                const matchesTab = row.dataset.status === currentTab;
+                row.style.display = (matchesSearch && matchesTab) ? '' : 'none';
+            });
+        }
+
+        // Initialize with registered tab
+        showTab('registered');
+
+        function openUserModal(userId) {
+            document.getElementById('userModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            loadUserDetails(userId);
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        async function loadUserDetails(userId) {
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full"></div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/Admin/Dashboard?handler=UserDetails&userId=${userId}`);
+                const html = await response.text();
+                modalBody.innerHTML = html;
+                lucide.createIcons();
+            } catch (error) {
+                modalBody.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center gap-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                        <span>Failed to load user details</span>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        async function resetPassword(userId) {
+            if (!confirm('Are you sure you want to reset this user\'s password?')) {
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/Admin/Dashboard?handler=ResetPassword';
+
+            const userIdInput = document.createElement('input');
+            userIdInput.type = 'hidden';
+            userIdInput.name = 'userId';
+            userIdInput.value = userId;
+            form.appendChild(userIdInput);
+
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            form.appendChild(tokenInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function prepareGroupsForm(form) {
+            const checkboxes = form.querySelectorAll('.group-checkbox');
+            if (checkboxes.length === 0) return true;
+
+            checkboxes.forEach(cb => {
+                const dn = cb.dataset.dn;
+                const isMember = cb.dataset.member === 'true';
+                const isChecked = cb.checked;
+
+                if (isMember && !isChecked) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'groupsToRemove';
+                    input.value = dn;
+                    form.appendChild(input);
+                } else if (!isMember && isChecked) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'groupsToAdd';
+                    input.value = dn;
+                    form.appendChild(input);
+                }
+            });
+
+            return true;
+        }
+
+        document.getElementById('modalBody').addEventListener('submit', function(e) {
+            if (e.target.tagName === 'FORM') {
+                prepareGroupsForm(e.target);
+            }
+        }, true);
+    </script>
+</body>
+</html>

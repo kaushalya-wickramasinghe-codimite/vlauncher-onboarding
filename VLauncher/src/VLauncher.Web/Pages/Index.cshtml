@@ -1,0 +1,127 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VLauncher - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Logo/Brand Section -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 mb-2">
+                <div class="w-10 h-10 bg-primary-600 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-2xl font-bold text-primary-700">VLauncher</span>
+            </div>
+            <p class="text-gray-500 text-sm">Admin Control Panel</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white shadow-lg border border-gray-200 p-8">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-1">Welcome Back</h2>
+                <p class="text-gray-500 text-sm">Sign in with your Active Directory account</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 mb-6 flex items-center gap-3">
+                    <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+                    <span class="text-sm">@Model.ErrorMessage</span>
+                </div>
+            }
+
+            <form method="post" class="space-y-5">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                        Username
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input type="text"
+                               id="username"
+                               name="Username"
+                               class="w-full border border-gray-300 text-gray-800 placeholder-gray-400 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                               placeholder="Enter your AD username"
+                               required />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input type="password"
+                               id="password"
+                               name="Password"
+                               class="w-full border border-gray-300 text-gray-800 placeholder-gray-400 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                               placeholder="Enter your password"
+                               required />
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 transition-all duration-200 flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-center text-gray-400 text-xs flex items-center justify-center gap-1">
+                    <i data-lucide="shield" class="w-3 h-3"></i>
+                    Protected by Active Directory Authentication
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-gray-400 text-xs mt-6">
+            VLauncher Admin Panel &copy; 2025
+        </p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
